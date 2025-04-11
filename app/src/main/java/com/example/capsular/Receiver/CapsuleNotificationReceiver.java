@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
 
@@ -21,12 +20,14 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String capsuleTitle = intent.getStringExtra("capsuleTitle");
+        String capsuleDate = intent.getStringExtra("capsuleDate");
 
         Intent notificationIntent = new Intent(context, HomeActivity.class);
+        notificationIntent.putExtra("capsule_date", capsuleDate); // Pass capsule date
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                0,
+                capsuleDate != null ? capsuleDate.hashCode() : 0,
                 notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -56,7 +57,14 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-        int notificationId = capsuleTitle != null ? capsuleTitle.hashCode() : (int) System.currentTimeMillis();
+        // Use capsuleDate hash for unique ID
+        int notificationId = capsuleDate != null ? capsuleDate.hashCode() : (int) System.currentTimeMillis();
         notificationManager.notify(notificationId, builder.build());
+
+        // Set hasUnread flag for notification dot
+        context.getSharedPreferences("notifications", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("hasUnread", true)
+                .apply();
     }
 }
