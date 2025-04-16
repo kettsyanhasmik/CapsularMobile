@@ -35,7 +35,6 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Create channel for Android 8.0+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
@@ -57,11 +56,9 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-        // Use capsuleDate hash for unique ID
         int notificationId = capsuleDate != null ? capsuleDate.hashCode() : (int) System.currentTimeMillis();
         notificationManager.notify(notificationId, builder.build());
 
-        // Set hasUnread flag for notification dot
         context.getSharedPreferences("notifications", Context.MODE_PRIVATE)
                 .edit()
                 .putBoolean("hasUnread", true)
