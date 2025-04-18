@@ -23,7 +23,7 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
         String capsuleDate = intent.getStringExtra("capsuleDate");
 
         Intent notificationIntent = new Intent(context, HomeActivity.class);
-        notificationIntent.putExtra("capsule_date", capsuleDate); // Pass capsule date
+        notificationIntent.putExtra("capsule_date", capsuleDate);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
