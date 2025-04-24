@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
 
@@ -20,14 +21,12 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String capsuleTitle = intent.getStringExtra("capsuleTitle");
-        String capsuleDate = intent.getStringExtra("capsuleDate");
 
         Intent notificationIntent = new Intent(context, HomeActivity.class);
-        notificationIntent.putExtra("capsule_date", capsuleDate);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                capsuleDate != null ? capsuleDate.hashCode() : 0,
+                0,
                 notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -35,6 +34,7 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // Create channel for Android 8.0+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
@@ -56,12 +56,7 @@ public class CapsuleNotificationReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-        int notificationId = capsuleDate != null ? capsuleDate.hashCode() : (int) System.currentTimeMillis();
+        int notificationId = capsuleTitle != null ? capsuleTitle.hashCode() : (int) System.currentTimeMillis();
         notificationManager.notify(notificationId, builder.build());
-
-        context.getSharedPreferences("notifications", Context.MODE_PRIVATE)
-                .edit()
-                .putBoolean("hasUnread", true)
-                .apply();
     }
 }
